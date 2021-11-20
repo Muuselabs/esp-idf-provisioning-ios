@@ -198,6 +198,13 @@ class ESPBleTransport: NSObject, ESPCommunicable {
         
         self.delegate = delegate
 
+        // Note(wdm) If there are many BLE devices detected, iOS does not resolve the name, breaking scanning.
+        //           We filter by our custom UUID to reduce the number of devices detected as recommened by Apple:
+        //           https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1518986-scanforperipherals
+        //           "The recommended practice is to populate the serviceUUIDs parameter rather than leaving it nil."
+        // Note(wdm) Here and elsewhere, the service UUID should be an argument.
+        let UUID_JOOKI_SERVICE = CBUUID(string:"b3562d79-1a6f-6c59-368a-599ca5481a90")
+
         if isBLEEnabled {
             bleScanTimer?.invalidate()
             bleScanTimer = Timer.scheduledTimer(timeInterval: scanTimeout,
@@ -205,7 +212,7 @@ class ESPBleTransport: NSObject, ESPCommunicable {
                                      selector: #selector(stopScan(timer:)),
                                      userInfo: nil,
                                      repeats: true)
-            centralManager.scanForPeripherals(withServices: nil)
+            centralManager.scanForPeripherals(withServices: [UUID_JOOKI_SERVICE])
         }
     }
 
@@ -263,7 +270,9 @@ extension ESPBleTransport: CBCentralManagerDelegate {
                                      selector: #selector(stopScan(timer:)),
                                      userInfo: nil,
                                      repeats: true)
-            centralManager.scanForPeripherals(withServices: nil)
+            // Note(wdm) See UUID comments above.
+            let UUID_JOOKI_SERVICE = CBUUID(string:"b3562d79-1a6f-6c59-368a-599ca5481a90")
+            centralManager.scanForPeripherals(withServices: [UUID_JOOKI_SERVICE])
         @unknown default: break
         }
     }
