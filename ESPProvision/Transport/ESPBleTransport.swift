@@ -282,12 +282,18 @@ extension ESPBleTransport: CBCentralManagerDelegate {
                         advertisementData data: [String: Any],
                         rssi _: NSNumber) {
         ESPLog.log("Peripheral devices discovered.\(data.debugDescription)")
-        if let peripheralName = data["kCBAdvDataLocalName"] as? String ?? peripheral.name  {
-            if peripheralName.lowercased().hasPrefix(deviceNamePrefix.lowercased()) {
-                let newEspDevice  = ESPDevice(name: peripheralName, security: .secure, transport: .ble, advertisementData: data)
-                espressifPeripherals[peripheralName] = newEspDevice
-                newEspDevice.peripheral = peripheral
-            }
+
+        // Note(wdm) This is always empty for Jooki
+        let advertisedName = data["kCBAdvDataLocalName"] as? String
+        // Note(wdm) The cached name is empty until after the first connection.
+        let cachedName = peripheral.name
+        // Note(wdm) Fallback to a synthetic name so that we can address this device.
+        let idName = "NEW_" + peripheral.identifier.uuidString
+        let peripheralName = advertisedName ?? cachedName ?? idName
+        if peripheralName.lowercased().hasPrefix(deviceNamePrefix.lowercased()) {
+            let newEspDevice  = ESPDevice(name: peripheralName, security: .secure, transport: .ble, advertisementData: data)
+            espressifPeripherals[peripheralName] = newEspDevice
+            newEspDevice.peripheral = peripheral
         }
     }
 
