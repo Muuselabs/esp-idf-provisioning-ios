@@ -19,6 +19,8 @@
 import CoreBluetooth
 import Foundation
 
+// Note(wdm) Here and elsewhere, the service UUID should be an argument.
+let UUID_JOOKI_SERVICE = CBUUID(string:"b3562d79-1a6f-6c59-368a-599ca5481a90")
 
 /// The `ESPBLEStatusDelegate` protocol define methods that provide information
 /// of current BLE device connection status
@@ -202,9 +204,6 @@ class ESPBleTransport: NSObject, ESPCommunicable {
         //           We filter by our custom UUID to reduce the number of devices detected as recommened by Apple:
         //           https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1518986-scanforperipherals
         //           "The recommended practice is to populate the serviceUUIDs parameter rather than leaving it nil."
-        // Note(wdm) Here and elsewhere, the service UUID should be an argument.
-        let UUID_JOOKI_SERVICE = CBUUID(string:"b3562d79-1a6f-6c59-368a-599ca5481a90")
-
         if isBLEEnabled {
             bleScanTimer?.invalidate()
             bleScanTimer = Timer.scheduledTimer(timeInterval: scanTimeout,
@@ -271,7 +270,6 @@ extension ESPBleTransport: CBCentralManagerDelegate {
                                      userInfo: nil,
                                      repeats: true)
             // Note(wdm) See UUID comments above.
-            let UUID_JOOKI_SERVICE = CBUUID(string:"b3562d79-1a6f-6c59-368a-599ca5481a90")
             centralManager.scanForPeripherals(withServices: [UUID_JOOKI_SERVICE])
         @unknown default: break
         }
@@ -320,9 +318,18 @@ extension ESPBleTransport: CBPeripheralDelegate {
         ESPLog.log("Peripheral did discover services.")
         guard let services = peripheral.services else { return }
         currentPeripheral = peripheral
-        currentService = services[0]
+        // Note(wdm) The upstream code assumes provisioning service is the first service.
+        // TODO(wdm) File bug and link it here
+        // TODO(wdm) We will need to discover the other services later if we want to use them.
+        for s in services {
+            if s.uuid == UUID_JOOKI_SERVICE {
+                currentService = s
+            }
+        }
         if let currentService = currentService {
             currentPeripheral?.discoverCharacteristics(nil, for: currentService)
+        } else {
+            ESPLog.log("Error: Peripheral did NOT discover Jooki provisioning service.")
         }
     }
 
