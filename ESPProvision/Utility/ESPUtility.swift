@@ -52,7 +52,8 @@ class ESPUtility {
                 peripheralConfigured = true
                 sessionCharacteristic = descriptor.characteristic
             }
-            if let associatedCharacteristic = descriptor.characteristic {
+            // Note(wdm) 'as CBCharacteristic?' required for Xcode12 support.
+            if let associatedCharacteristic = descriptor.characteristic as CBCharacteristic? {
                 configUUIDMap.updateValue(associatedCharacteristic, forKey: value)
             }
         }
