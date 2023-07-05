@@ -17,10 +17,10 @@
 //
 
 import CoreBluetooth
-import ESPProvision
 import Foundation
 import MBProgressHUD
 import UIKit
+import ESPProvision
 
 // Class that shows Wi-Fi network list and takes Wi-Fi credentials from user.
 class ProvisionViewController: UIViewController {
@@ -107,11 +107,11 @@ class ProvisionViewController: UIViewController {
             DispatchQueue.main.async {
                 self.tableView.isHidden = false
                 self.headerView.isHidden = false
-                Utility.hideLoader(view: self.view)
                 if let list = wifiList {
                     self.wifiDetailList = list.sorted { $0.rssi > $1.rssi }
                 }
                 self.tableView.reloadData()
+                Utility.hideLoader(view: self.view)
             }
         }
     }

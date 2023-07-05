@@ -1,4 +1,4 @@
-// Copyright 2020 Espressif Systems
+// Copyright 2022 Espressif Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  ESPProvision.h
+//  ESPScanStatus.swift
 //  ESPProvision
 //
 
-#import <Foundation/Foundation.h>
-#import <CommonCrypto/CommonDigest.h>
-#import "AESDecryptor.h"
+import Foundation
 
-//! Project version number for ESPProvision.
-FOUNDATION_EXPORT double ESPProvisionVersionNumber;
-
-//! Project version string for ESPProvision.
-FOUNDATION_EXPORT const unsigned char ESPProvisionVersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <ESPProvision/PublicHeader.h>
-
-
+/// 'ESPScanStatus' defines intermediate stages of reading and processing QR code.
+public enum ESPScanStatus {
+    // QR Code scanning has started.
+    case scanStarted
+    // Parsing QR Code.
+    case readingCode
+    // Searching for BLE device with the name parsed from code.
+    case searchingBLE(String)
+    // Joining SoftAP network with the name parsed from code.
+    case joiningSoftAP(String)
+}

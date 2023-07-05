@@ -23,11 +23,13 @@ ESPProvision is a provisioning library written in Swift. It provides mechanism t
 - [x] Provision device.
 - [x] Scan for available Wi-Fi networks.
 - [x] Console logs
+- [x] Support for security version 2.
+
 
 ## Requirements
 
-- iOS 11.0+ / macOS 10.12+
-- Xcode 11+
+- iOS 13.0+ / macOS 10.12+
+- Xcode 13+
 - Swift 5.1+
 - Enable Hotspot Configuration capability in Xcode.
 - Enable Access WiFI Information capability in Xcode.
@@ -43,6 +45,24 @@ ESPProvision is a provisioning library written in Swift. It provides mechanism t
 pod 'ESPProvision'
 
 ```
+
+### Swift Package Manager
+
+The [Swift Package Manager](https://swift.org/package-manager/) is a tool for automating the distribution of Swift code and is integrated into the `swift` compiler. 
+
+Once you have your Swift package set up, adding ESPProvision as a dependency is as easy as adding it to the `dependencies` value of your `Package.swift`.
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/espressif/esp-idf-provisioning-ios.git", from: "2.1.1")
+]
+```
+
+### ...using Xcode
+
+If you are using Xcode, then you should add this SwiftPM package as dependency of your xcode project:
+  [Apple Docs](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app)
+
 
 ## Using ESPProvision
 
@@ -118,6 +138,17 @@ func getProofOfPossesion(forDevice: ESPDevice, completionHandler: @escaping (Str
 }
 
 ```
+
+For security version 2, provide username as shown below from delegate class :
+
+```swift
+
+func getUsername(forDevice: ESPProvision.ESPDevice, completionHandler: @escaping (String?) -> Void) {
+    completionHandler(username)
+}
+
+```
+
 
 If status is connected then application can proceed to scan list of available networks visible to device. This list can be used to give option to the user to choose network of their own choice.
 
